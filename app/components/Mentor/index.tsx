@@ -1,50 +1,16 @@
 "use client"
 import Slider from "react-slick";
-import React, { Component } from "react";
+import { Component } from "react";
 import Image from "next/image";
+import React, { useState, useEffect } from "react";
 
 // CAROUSEL DATA
 
-interface DataType {
+interface Prof {
     profession: string;
     name: string;
     imgSrc: string;
 }
-
-const postData: DataType[] = [
-    {
-        profession: 'Senior UX Designer',
-        name: 'Shoo Thar Mien',
-        imgSrc: '/assets/mentor/user3.png',
-    },
-    {
-        profession: 'Senior UX Designer',
-        name: 'Shoo Thar Mien',
-        imgSrc: '/assets/mentor/user2.png',
-    },
-    {
-        profession: 'Senior UX Designer',
-        name: 'Shoo Thar Mien',
-        imgSrc: '/assets/mentor/user1.png',
-    },
-    {
-        profession: 'Senior UX Designer',
-        name: 'Shoo Thar Mien',
-        imgSrc: '/assets/mentor/user3.png',
-    },
-    {
-        profession: 'Senior UX Designer',
-        name: 'Shoo Thar Mien',
-        imgSrc: '/assets/mentor/user2.png',
-    },
-    {
-        profession: 'Senior UX Designer',
-        name: 'Shoo Thar Mien',
-        imgSrc: '/assets/mentor/user1.png',
-    },
-]
-
-// CAROUSEL SETTINGS
 
 function SampleNextArrow(props: { className: any; style: any; onClick: any; }) {
     const { className, style, onClick } = props;
@@ -70,9 +36,25 @@ function SamplePrevArrow(props: { className: any; style: any; onClick: any; }) {
 
 
 
-export default class MultipleItems extends Component {
+const CourseList = () => {
+  const [profs, setProfs] = useState<Prof[]>([]);
 
-    render() {
+  useEffect(() => {
+    const fetchCoursesData = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/profs');
+        const data = await response.json();
+        console.log("ffffffffff");
+        setProfs(data);
+        console.log(data);
+        
+      } catch (error) {
+        console.error('Erreur lors de la récupération des cours:', error);
+      }
+    };
+
+    fetchCoursesData();
+  }, []);
         const settings = {
             dots: false,
             infinite: true,
@@ -125,7 +107,7 @@ export default class MultipleItems extends Component {
                     <h2 className="lh-82 text-midnightblue text-4xl md:text-55xl text-center md:text-start font-semibold">Meet with our <br /> mentor.</h2>
 
                     <Slider {...settings}>
-                        {postData.map((items, i) => (
+                        {profs.map((items, i) => (
                             <div key={i}>
                                 <div className='m-3 py-14 md:my-10 text-center'>
                                     <div className="relative">
@@ -147,5 +129,6 @@ export default class MultipleItems extends Component {
             </div>
 
         );
-    }
+    
 }
+export default CourseList;

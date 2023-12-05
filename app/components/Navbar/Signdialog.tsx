@@ -1,30 +1,72 @@
-import { Dialog, Transition } from '@headlessui/react'
-import { Fragment, useState } from 'react'
-import { LockClosedIcon } from '@heroicons/react/20/solid'
-
+import { Dialog, Transition } from '@headlessui/react';
+import { Fragment, useState } from 'react';
+import { LockClosedIcon } from '@heroicons/react/20/solid';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import axios from 'axios';
+import RootLayout from '@/app/layout';
+import Home from '@/app/page';
 
 const Signin = () => {
-    let [isOpen, setIsOpen] = useState(false)
+  let [isOpen, setIsOpen] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [redirect, setRedirect] = useState(false);
 
-    const closeModal = () => {
-        setIsOpen(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const url = "http://localhost:5000/api/user/login";
+
+  const handleLogin = async (e: any) => {
+    try {
+      e.preventDefault();
+      await axios.post(url, {
+        email: email,
+        password: password
+      });
+      setErrorMessage(null);
+      setRedirect(true);
+    } catch (error: any) {
+      console.error('Erreur lors de l\'inscription :', error.message);
+
+      toast.error('Données erronées', {
+        position: "bottom-center",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light"
+      });
     }
+  };
 
-    const openModal = () => {
-        setIsOpen(true)
-    }
+  const closeModal = () => {
+    setIsOpen(false);
+  };
 
-    return (
-        <>
-            <div className="absolute inset-y-0 right-0 flex items-center sm:static sm:inset-auto sm:pr-0">
+  const openModal = () => {
+    setIsOpen(true);
+  };
+
+return (
+  <div>
+    {redirect ? (
+      // If authenticated, render the Home component
+      <RootLayout>
+        <Home isAuthenticated={true} />
+      </RootLayout>
+    ) : (
+                // If not authenticated, render the login form
+                <div>
+     <div className="absolute inset-y-0 right-0 flex items-center sm:static sm:inset-auto sm:pr-0">
                 <div className='hidden lg:block'>
                     <button type="button" className='text-lg text-Blueviolet font-medium' onClick={openModal}>
                         Log In
                     </button>
                 </div>
-            </div>
-
-            <Transition appear show={isOpen} as={Fragment}>
+                </div>
+        <Transition appear show={isOpen} as={Fragment}>
                 <Dialog as="div" className="relative z-10" onClose={closeModal}>
                     <Transition.Child
                         as={Fragment}
@@ -63,7 +105,7 @@ const Signin = () => {
                                                     Sign in to your account
                                                 </h2>
                                             </div>
-                                            <form className="mt-8 space-y-6" action="#" method="POST">
+                                            <form className="mt-8 space-y-6" onSubmit={handleLogin}>
                                                 <input type="hidden" name="remember" defaultValue="true" />
                                                 <div className="-space-y-px rounded-md shadow-sm">
                                                     <div>
@@ -71,8 +113,8 @@ const Signin = () => {
                                                             Email address
                                                         </label>
                                                         <input
-                                                            id="email-address"
-                                                            name="email"
+                                                           value={email}
+                                                            onChange={(e) => setEmail(e.target.value)}
                                                             type="email"
                                                             autoComplete="email"
                                                             required
@@ -85,8 +127,8 @@ const Signin = () => {
                                                             Password
                                                         </label>
                                                         <input
-                                                            id="password"
-                                                            name="password"
+                                                            value={password}
+                                                            onChange={(e) => setPassword(e.target.value)}
                                                             type="password"
                                                             autoComplete="current-password"
                                                             required
@@ -128,6 +170,8 @@ const Signin = () => {
                                                     </button>
                                                 </div>
                                             </form>
+                                                 {/* ToastContainer est où les messages toast seront rendus */}
+                                        <ToastContainer />
                                         </div>
                                     </div>
 
@@ -146,9 +190,15 @@ const Signin = () => {
                         </div>
                     </div>
                 </Dialog>
-            </Transition>
-        </>
-    )
+            </Transition>   
+    </div>
+    )}
+  </div>
+);
+
 }
 
 export default Signin;
+   
+
+         

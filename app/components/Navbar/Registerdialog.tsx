@@ -1,9 +1,41 @@
 import { Dialog, Transition } from '@headlessui/react'
 import { Fragment, useState } from 'react'
 import { LockClosedIcon } from '@heroicons/react/20/solid'
-
-
+import { toast, ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css';
+import axios from 'axios'
 const Register = () => {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [nom, setNom] = useState('');
+
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const url="http://localhost:5000/api/user/register"
+    const handleRegister = async (e: any) => {
+    try {
+        e.preventDefault();
+        await axios.post(url, {
+            email: email,
+            password: password,
+            name:nom
+        });
+        setErrorMessage(null);
+    } catch (error:any) {
+        console.error('Erreur lors de l\'inscription :', error.message);
+
+        toast.error('Cet email est déjà utilisé', {
+            position: "bottom-center",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light"
+        });
+    }
+};
+
     let [isOpen, setIsOpen] = useState(false)
 
     const closeModal = () => {
@@ -13,7 +45,10 @@ const Register = () => {
     const openModal = () => {
         setIsOpen(true)
     }
-
+    const closeErrorMessage = () => {
+    // Fermer le message d'erreur en réinitialisant le message
+    setErrorMessage(null);
+  };
     return (
         <>
             <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto  sm:pr-0">
@@ -63,16 +98,30 @@ const Register = () => {
                                                     Register your account
                                                 </h2>
                                             </div>
-                                            <form className="mt-8 space-y-6" action="#" method="POST">
+                                            <form className="mt-8 space-y-6" onSubmit={handleRegister}>
                                                 <input type="hidden" name="remember" defaultValue="true" />
                                                 <div className="-space-y-px rounded-md shadow-sm">
+                                                    <div>
+                                                        <label htmlFor="email-address" className="sr-only">
+                                                            Nom
+                                                        </label>
+                                                        <input
+                                                            value={nom}
+                                                            onChange={(e) => setNom(e.target.value)}
+                                                            type="text"
+                                                            
+                                                            required
+                                                            className="relative block w-full appearance-none rounded-none rounded-t-md border border-grey500 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+                                                            placeholder="Votre Nom"
+                                                        />
+                                                    </div>
                                                     <div>
                                                         <label htmlFor="email-address" className="sr-only">
                                                             Email address
                                                         </label>
                                                         <input
-                                                            id="email-address"
-                                                            name="email"
+                                                            value={email}
+                                                            onChange={(e) => setEmail(e.target.value)}
                                                             type="email"
                                                             autoComplete="email"
                                                             required
@@ -85,8 +134,8 @@ const Register = () => {
                                                             Password
                                                         </label>
                                                         <input
-                                                            id="password"
-                                                            name="password"
+                                                            value={password}
+                                                            onChange={(e) => setPassword(e.target.value)}
                                                             type="password"
                                                             autoComplete="current-password"
                                                             required
@@ -113,8 +162,7 @@ const Register = () => {
 
                                                 <div>
                                                     <button
-                                                        type="submit"
-                                                        className="group relative flex w-full justify-center rounded-md border border-transparent bg-Blueviolet py-2 px-4 text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                                 className="group relative flex w-full justify-center rounded-md border border-transparent bg-Blueviolet py-2 px-4 text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                                                     >
                                                         <span className="absolute inset-y-0 left-0 flex items-center pl-3">
                                                             <LockClosedIcon className="h-5 w-5 text-indigo-500 group-hover:text-indigo-400" aria-hidden="true" />
@@ -123,6 +171,9 @@ const Register = () => {
                                                     </button>
                                                 </div>
                                             </form>
+                                         {/* ToastContainer est où les messages toast seront rendus */}
+                                        <ToastContainer />
+
                                         </div>
                                     </div>
 
@@ -145,5 +196,4 @@ const Register = () => {
         </>
     )
 }
-
 export default Register;
