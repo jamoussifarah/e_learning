@@ -2,7 +2,6 @@
 
 import Slider from "react-slick";
 
-import { Component } from "react";
 import { StarIcon } from '@heroicons/react/24/solid';
 import Image from "next/image";
 import React, { useState, useEffect } from "react";
@@ -23,21 +22,24 @@ interface Avis {
 const AvisList = () => {
   const [avis, setAvis] = useState<Avis[]>([]);
 
-  useEffect(() => {
-    const fetchAvisData = async () => {
-      try {
-        const response = await fetch('http://localhost:5000/api/avis');
-        const data = await response.json();
-        setAvis(data);
-        console.log(data);
-
-      } catch (error) {
-        console.error('Erreur lors de la récupération des avis:', error);
+ useEffect(() => {
+  const fetchAvisData = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/api/avis');
+      if (!response.ok) {
+        throw new Error('Failed to fetch data');
       }
-    };
+      const data = await response.json();
+      console.log("ffffffffff");
+      setAvis(data);
+      console.log(data);
+    } catch (error) {
+      console.error('Erreur lors de la récupération des avis:', error);
+    }
+  };
+  fetchAvisData();
+}, []);
 
-    fetchAvisData();
-  }, []);
 
   const settings = {
     dots: true,
@@ -96,7 +98,6 @@ const AvisList = () => {
                 <hr style={{ color: "#D7D5D5" }} />
                 <div className="flex justify-between">
                   <div>
-                    <h3 className='text-lg font-medium text-darkbrown pt-4 pb-2'>{items.participant.name}</h3>
                   </div>
                   <div className="flex">
                     <StarIcon width={20} className="text-gold" />
